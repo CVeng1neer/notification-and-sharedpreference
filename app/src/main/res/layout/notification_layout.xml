@@ -5,13 +5,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/genshin">
+    >
+
+    <Button
+        android:id="@+id/get"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="执行GET请求"
+        tools:ignore="MissingConstraints"
+        app:layout_constraintEnd_toStartOf="@id/post"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <Button
+        android:id="@+id/post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="执行POST请求"
+        tools:ignore="MissingConstraints"
+        app:layout_constraintStart_toEndOf="@+id/get"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/textview"
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="原神，启动！"
+        android:text="Notification layout！"
         android:textColor="@color/purple_200"
         android:textSize="30sp"
         android:textStyle="bold"
