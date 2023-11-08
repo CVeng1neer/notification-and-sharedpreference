@@ -1,13 +1,35 @@
 package com.example.rememberpassword;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.InputStream;
+import java.util.List;
+
 import okhttp3.FormBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -17,42 +39,80 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NotificationActivity extends Activity {
     private String TAG = "444";
     private TextView mTextView;
+    private ImageView mImageView;
+    private Spinner spinner;
     private Retrofit mRetrofit;
+    @SuppressLint("MissingInflatedId")
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notification_layout);
 
         Button get = (Button) findViewById(R.id.get);
         Button post = (Button) findViewById(R.id.post);
-         mTextView = findViewById(R.id.textview);
+        mImageView = findViewById(R.id.imageview);
+        spinner = findViewById(R.id.spinner);
+        //mTextView = findViewById(R.id.textview);
 
-         mRetrofit = new Retrofit.Builder()
-                //设置网络请求BaseUrl地址
-                .baseUrl("https://api.uomg.com/")
-                //设置数据解析器
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        // 初始化 Spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
         get.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getJsonData();
+                loadImage();
             }
         });
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                postJsonData();
+                finish();
             }
         });
     }
+    private void loadImage() {
+        // 获取 Spinner 选中的值
+        String sort = spinner.getSelectedItem().toString();
+        //步骤4:创建Retrofit对象
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.uomg.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        // 步骤5:创建网络请求接口对象实例
+        Api apiService = retrofit.create(Api.class);
+        //步骤6：对发送请求进行封装，传入接口参数
+        Call<ImageResponse> call = apiService.fetchImage(sort, "json");
+        //步骤7:发送网络请求(异步)
+        Log.e(TAG, "get == url：" + call.request().url());
+        call.enqueue(new Callback<ImageResponse>() {
+            @Override
+            public void onResponse(Call<ImageResponse> call, Response<ImageResponse> response) {
+                if (response.isSuccessful()) {
+                    List<String> imageUrls = response.body().getImgurl();
+                    if (!imageUrls.isEmpty()) {
+                        String imageUrl = imageUrls.get(0);
+                        // 使用 Glide 加载图片
+                        Glide.with(NotificationActivity.this).load(imageUrl).into(mImageView);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<ImageResponse> call, Throwable t) {
+                Log.e(TAG, "get回调失败：" + t.getMessage() + "," + t.toString());
+                Toast.makeText(NotificationActivity.this, "get回调失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //下面是以前的调用api显示文本
+    /**
     private void getJsonData() {
         // 步骤5:创建网络请求接口对象实例
         Api api = mRetrofit.create(Api.class);
         //步骤6：对发送请求进行封装，传入接口参数
-        Call<Data<Info>> jsonDataCall = api.getJsonData("新歌榜", "json");
-
-        //同步执行
-//         Response<Data<Info>> execute = jsonDataCall.execute();
+        Call<Data<Info>> jsonDataCall = api.getJsonData("男", "images");
 
         //步骤7:发送网络请求(异步)
         Log.e(TAG, "get == url：" + jsonDataCall.request().url());
@@ -65,7 +125,10 @@ public class NotificationActivity extends Activity {
                 if (body == null) return;
                 Info info = body.getData();
                 if (info == null) return;
-                mTextView.setText("返回的数据：" + "\n\n" + info.getName() + "\n" + info.getPicurl());
+                //mTextView.setText("返回的数据：" + "\n\n" + info.getName() + "\n" + info.getPicurl());
+//                Glide.with(NotificationActivity.this)
+//                        .load(info.getPicurl())
+//                        .into(mImageView);
             }
 
             @Override
@@ -124,4 +187,5 @@ public class NotificationActivity extends Activity {
             }
         });
     }
+     **/
 }

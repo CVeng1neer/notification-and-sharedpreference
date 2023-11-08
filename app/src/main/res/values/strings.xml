@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">rememberpassword</string>
+
+    <string-array name="sort_array">
+        <item>女仆</item>
+        <item>兔女郎</item>
+        <item>jk制服</item>
+        <item>夏日泳装</item>
+        <item>白丝</item>
+        <item>肉丝</item>
+        <item>动漫类</item>
+        <item>萝莉</item>
+        <item>御姐</item>
+        <item>巨乳</item>
+        <item>腿控</item>
+        <item>臀控</item>
+    </string-array>
+
 </resources>
